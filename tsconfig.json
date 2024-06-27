@@ -1,6 +1,9 @@
 {
     "extends": "@vue/tsconfig/tsconfig.json",
     "compilerOptions": {
+        "strict": true,
+        "sourceMap": true,
+        "target": "esnext",
         "types": ["vite/client"],
         "baseUrl": ".",
         "paths": {
