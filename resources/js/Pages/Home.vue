@@ -5,9 +5,10 @@ import {computed} from "vue";
 interface Country {
     name: {
         common: String,
-        official: String,
     }
-    population: Number
+    population: Number,
+    flag: String,
+    capital: String[]
 }
 
 interface Props {
@@ -30,7 +31,7 @@ const currentRegion = computed<String|null>(() => props.currentRegion)
         <div class="my-10">
             <div class="bg-white mt-10 rounded-xl shadow-xl p-10">
                 <h2 class="text-xl font-bold mb-5">Countries</h2>
-                <div class="flex -ml-2 my-2">
+                <div class="flex -ml-2 my-4">
 
                     <div class="mx-2"><a :class="{
                             'font-bold': currentRegion === null
@@ -47,8 +48,9 @@ const currentRegion = computed<String|null>(() => props.currentRegion)
                             <span class="mt-1 bg-lime-100 text-sm w-6 h-6 flex items-center justify-center rounded-full">{{ index + 1 }}</span>
                         </div>
                         <div>
-                            <span class="font-bold">{{country.name.common }}</span>
+                            <span class="font-bold">{{ country.flag }} {{country.name.common }}</span>
                             <span class="block">Population: {{ country.population.toLocaleString() }}</span>
+                            <span class="block" v-if="country.capital">Capital: {{ country.capital[0] ?? '-' }}</span>
                         </div>
                     </div>
                 </div>
