@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\GetCountries;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
 use Inertia\Inertia;
 
@@ -11,21 +13,26 @@ class HomeController extends Controller
     /**
      * Handle the incoming request.
      */
-    public function __invoke(Request $request)
+    public function __invoke(Request $request, GetCountries $getCountries)
     {
-        $countries = collect($this->getCachedCountries());
-
+        $countries = collect($getCountries->get());
         $regions = $countries->map(fn (array $country) => $country['region'])->unique()->values();
+
         $currentRegion = $request->get('region');
         if ($currentRegion && ! $regions->contains($currentRegion)) {
             throw new \ValueError('The selected region is invalid.');
         }
 
-        $countries = $countries->sortByDesc('population');
-        if ($currentRegion) {
-            $countries = $countries->filter(fn (array $country) => $country['region'] == $currentRegion);
-        }
-        $countries = $countries->take(10)->values();
+        $countries = $this->filterCountries($countries, $currentRegion);
+        $countries = $countries->take(10)->map(function ($country) {
+            return [
+                'id' => $country['cca3'],
+                'name' => $country['name'],
+                'capital' => $country['capital'][0] ?? null,
+                'flag' => $country['flag'],
+                'population' => $country['population'] ?? 0,
+            ];
+        })->values();
 
         return Inertia::render('Home', [
             'currentRegion' => $currentRegion,
@@ -34,22 +41,17 @@ class HomeController extends Controller
         ]);
     }
 
-    protected function getCountries(): array
-    {
-        $response = Http::get('https://restcountries.com/v3.1/all');
+    protected function filterCountries(
+        Collection $countries,
+        ?string $currentRegion
+    ): Collection {
 
-        return $response->json();
+        $countries = $countries->sortByDesc('population');
+        if ($currentRegion) {
+            $countries = $countries->filter(fn (array $country) => $country['region'] == $currentRegion);
+        }
+
+        return $countries;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getCachedCountries(): array
-    {
-        $cacheLifetime = now()->addMinutes(60);
-
-        return cache()->remember(key: 'countries', ttl: $cacheLifetime, callback: function () {
-            return $this->getCountries();
-        });
-    }
 }

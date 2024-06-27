@@ -1,29 +1,21 @@
 <script setup lang="ts">
-
 import {computed} from "vue";
-
-interface Country {
-    name: {
-        common: String,
-    }
-    population: Number,
-    flag: String,
-    capital: String[]
-}
+import type {CountryListItem} from "@/types";
 
 interface Props {
     regions: string[],
-    countries: Country[]
+    countries: CountryListItem[]
     currentRegion: string | null,
 }
 
 
 const props = defineProps<Props>()
 
-const countries = computed<Country[]>(() => props.countries)
+const countries = computed<CountryListItem[]>(() => props.countries)
 const regions = computed<String[]>(() => props.regions)
 const currentRegion = computed<String|null>(() => props.currentRegion)
 
+console.log(props.countries)
 </script>
 
 <template>
@@ -42,18 +34,28 @@ const currentRegion = computed<String|null>(() => props.currentRegion)
                         }" :href="`?region=${region}`">{{ region }}</a>
                     </div>
                 </div>
+
                 <div v-for="(country, index) in countries" class="mb-4">
                     <div class="flex">
                         <div class="mr-2 block">
-                            <span class="mt-1 bg-lime-100 text-sm w-6 h-6 flex items-center justify-center rounded-full">{{ index + 1 }}</span>
+                            <span class="mt-1 bg-lime-100 text-sm w-6 h-6 flex items-center justify-center rounded-full">
+                                {{ index + 1 }}
+                            </span>
                         </div>
                         <div>
-                            <span class="font-bold">{{ country.flag }} {{country.name.common }}</span>
-                            <span class="block">Population: {{ country.population.toLocaleString() }}</span>
-                            <span class="block" v-if="country.capital">Capital: {{ country.capital[0] ?? '-' }}</span>
+                            <span class="font-bold">
+                                {{ country.flag }} <a class="hover:underline" :href="`./countries/${country.id}`">{{country.name.common }}</a>
+                            </span>
+                            <span class="block">
+                                Population: {{ country.population.toLocaleString() }}
+                            </span>
+                            <span class="block">
+                                Capital: {{ country.capital ?? '-' }}
+                            </span>
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
 
