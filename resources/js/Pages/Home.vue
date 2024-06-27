@@ -11,15 +11,18 @@ interface Country {
 }
 
 interface Props {
+    regions: string[],
     countries: Country[]
+    currentRegion: string | null,
 }
 
 
 const props = defineProps<Props>()
 
-const countries = computed(() => props.countries)
+const countries = computed<Country[]>(() => props.countries)
+const regions = computed<String[]>(() => props.regions)
+const currentRegion = computed<String|null>(() => props.currentRegion)
 
-console.log(props.countries);
 </script>
 
 <template>
@@ -27,6 +30,17 @@ console.log(props.countries);
         <div class="my-10">
             <div class="bg-white mt-10 rounded-xl shadow-xl p-10">
                 <h2 class="text-xl font-bold mb-5">Countries</h2>
+                <div class="flex -ml-2 my-2">
+
+                    <div class="mx-2"><a :class="{
+                            'font-bold': currentRegion === null
+                        }" class="hover:underline" href="?">All</a></div>
+                    <div v-for="region in regions" class="mx-2">
+                        <a class="hover:underline" :class="{
+                            'font-bold': currentRegion === region
+                        }" :href="`?region=${region}`">{{ region }}</a>
+                    </div>
+                </div>
                 <div v-for="(country, index) in countries" class="mb-4">
                     <div class="flex">
                         <div class="mr-2 block">

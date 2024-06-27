@@ -15,10 +15,22 @@ class HomeController extends Controller
     {
         $countries = collect($this->getCachedCountries());
 
-        $countries = $countries->sortByDesc('population')->take(10)->values();
+        $regions = $countries->map(fn (array $country) => $country['region'])->unique()->values();
+        $currentRegion = $request->get('region');
+        if ($currentRegion && ! $regions->contains($currentRegion)) {
+            throw new \ValueError('The selected region is invalid.');
+        }
+
+        $countries = $countries->sortByDesc('population');
+        if ($currentRegion) {
+            $countries = $countries->filter(fn (array $country) => $country['region'] == $currentRegion);
+        }
+        $countries = $countries->take(10)->values();
 
         return Inertia::render('Home', [
+            'currentRegion' => $currentRegion,
             'countries' => $countries,
+            'regions' => $regions,
         ]);
     }
 
@@ -35,6 +47,7 @@ class HomeController extends Controller
     public function getCachedCountries(): array
     {
         $cacheLifetime = now()->addMinutes(60);
+
         return cache()->remember(key: 'countries', ttl: $cacheLifetime, callback: function () {
             return $this->getCountries();
         });
