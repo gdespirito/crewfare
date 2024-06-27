@@ -1,6 +1,22 @@
 
 # Crewfare Take-Home
 
+
+# Local installation
+
+1. Clone the repo on you machine
+2. Install [Laravel Herd](https://herd.laravel.com/)
+3. `cd /path/to/the-repo`
+4. `herd link crewfare`
+4. Run:
+```bash
+composer install
+yarn
+yarn dev
+php artisan key:generate
+```
+5. Open `crewfare.test` in your browser and it should work
+
 ## Objective
 
 Thank you for your continued interest in working with Crewfare! Were excited to have the chance to evaluate your technical skills. We have designed this project to allow you to demonstrate the skills needed for a Full Stack Engineer. The task is to create a simple two tier application that fetches data from an external API, processes the data, and displays it in a user-friendly format. This task will evaluate your ability to work with TypeScript, handle API requests, and manipulate and display data.
