@@ -3,7 +3,7 @@
 </script>
 
 <template>
-    <div>
+    <div class="container mx-auto">
         Hola
     </div>
 </template>
